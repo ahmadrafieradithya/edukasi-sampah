@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>STEM Waste Edu — Smart Sorter</title>
+  <style>
+    :root{
+      --green-900:#065f46;--green-800:#047857;--green-700:#059669;--green-600:#10b981;
+      --bg:#f0fff4;--card:#ffffff;--muted:#64748b;--radius:14px;--shadow:0 6px 18px rgba(2,6,23,0.08);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#ecfdf5 50%);color:#0f172a;-webkit-font-smoothing:antialiased;padding-bottom:40px}
+    a{color:inherit;text-decoration:none}
+    header{background:linear-gradient(90deg,var(--green-700),var(--green-600));color:white;padding:14px 18px;position:sticky;top:0;z-index:1000;box-shadow:0 3px 12px rgba(2,6,23,0.12)}
+    .container{max-width:1100px;margin:0 auto;padding:0 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:10px;background:rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:18px}
+    nav{display:flex;align-items:center;gap:10px}
+    .nav-links{display:flex;gap:8px}
+    .nav-links button{background:transparent;border:0;color:rgba(255,255,255,0.95);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+    .nav-links button:hover{background:rgba(255,255,255,0.08)}
+    .nav-links .active{background:rgba(255,255,255,0.12)}
+    .outline-wrap{position:relative}
+    .outline-btn{background:rgba(255,255,255,0.12);border:0;color:white;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600}
+    .outline-menu{position:absolute;right:0;margin-top:8px;background:var(--card);color:var(--green-900);border-radius:10px;box-shadow:var(--shadow);width:220px;overflow:hidden;border:1px solid rgba(2,6,23,0.04);z-index:1100}
+    .outline-menu .title{padding:10px 12px;font-size:13px;font-weight:700;color:var(--green-700);border-bottom:1px solid rgba(2,6,23,0.04)}
+    .outline-menu button{display:block;width:100%;text-align:left;padding:10px 12px;border:0;background:transparent;cursor:pointer}
+    .outline-menu button:hover{background:linear-gradient(90deg,#ecfdf5,#f0fff4)}
+    .mobile-toggle{display:none;background:rgba(255,255,255,0.12);border:0;padding:8px 10px;border-radius:8px;color:white;cursor:pointer}
+    @media (max-width:860px){ .nav-links{display:none} .mobile-toggle{display:inline-block} }
+
+    main{max-width:1100px;margin:28px auto;padding:0 18px}
+    section{display:none}
+    section.active{display:block}
+    .grid-2{display:grid;grid-template-columns:1fr 420px;gap:20px}
+    @media (max-width:980px){ .grid-2{grid-template-columns:1fr} }
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);border:1px solid rgba(2,6,23,0.04)}
+    h2{margin:0 0 8px 0;color:var(--green-800)}
+    .hero-title{font-size:28px;margin-bottom:8px;font-weight:800;color:var(--green-900)}
+    .muted{color:var(--muted);font-size:15px}
+    .stats{display:flex;gap:10px;margin-top:16px}
+    .stat{background:linear-gradient(180deg,#ecfdf5,#f0fff4);padding:12px;border-radius:10px;text-align:center;flex:1}
+    .stat .num{font-size:20px;font-weight:800;color:var(--green-800)}
+    .stat .label{font-size:12px;color:var(--green-700)}
+    .modules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+    @media (max-width:980px){ .modules{grid-template-columns:1fr} }
+    .module{padding:14px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#f8fffb);border:1px solid rgba(2,6,23,0.03)}
+    .module h3{margin:0;color:var(--green-800)}
+    .module ul{margin:8px 0 0 16px;color:var(--muted)}
+    .quiz-area{margin-top:12px}
+    .choices{display:grid;gap:8px;margin-top:10px}
+    .choice{padding:10px;border-radius:10px;border:1px solid rgba(2,6,23,0.06);background:linear-gradient(180deg,#fff,#f7fffb);cursor:pointer}
+    .choice:hover{background:linear-gradient(180deg,#ecfdf5,#effff4)}
+    .score{font-size:22px;font-weight:800;color:var(--green-800)}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:980px){ .two-col{grid-template-columns:1fr} }
+    footer{max-width:1100px;margin:22px auto;padding:18px;border-radius:12px;background:linear-gradient(90deg,var(--green-700),var(--green-600));color:white;box-shadow:var(--shadow)}
+    .btn{display:inline-block;padding:9px 12px;border-radius:10px;border:0;background:var(--green-700);color:white;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(2,6,23,0.06);color:var(--green-900)}
+    .muted-small{color:var(--muted);font-size:13px}
+    .center{text-align:center}
+    main, .card, button, .choice, .btn { pointer-events: auto; }
+    button, .choice, .btn { cursor: pointer; }
+
+    /* HERO: teks di samping ilustrasi */
+    .hero-wrapper { display:flex; gap:24px; align-items:center; padding:18px; }
+    .hero-text { flex:1; min-width:280px; }
+    .hero-illustration { width:420px; max-width:40%; border-radius:14px; background:linear-gradient(180deg,#ffffff,#f8fffb); padding:18px; box-shadow:var(--shadow); display:flex; align-items:center; justify-content:center; }
+    .hero-illustration svg { width:100%; height:auto; display:block; }
+    @media (max-width:980px) { .hero-wrapper { flex-direction:column; } .hero-illustration { width:100%; max-width:100%; } }
+
+    /* modal */
+    .modal-backdrop { position:fixed; inset:0; background:rgba(2,6,23,0.35); z-index:1998; display:flex; align-items:center; justify-content:center; padding:18px; }
+    .modal-card { max-width:900px; width:100%; max-height:90vh; overflow:auto; border-radius:14px; padding:18px; background:var(--card); box-shadow:var(--shadow); border:1px solid rgba(2,6,23,0.04); }
+
+    /* small helper for code block */
+    pre { background:#0f172a; color:#e6ffef; padding:12px; border-radius:8px; overflow:auto; }
+    code { font-family:monospace; font-size:13px; color:inherit; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="brand">
+        <div class="logo">ST</div>
+        <div>
+          <h1>STEM Waste Edu</h1>
+          <p style="margin:0;font-size:12px;opacity:0.95">Belajar Sampah & Solusi Berbasis STEM</p>
+        </div>
+      </div>
+
+      <nav>
+        <div class="outline-wrap" id="outlineWrap">
+          <button class="outline-btn" id="outlineBtn" type="button" aria-haspopup="true" aria-expanded="false">Outline ▾</button>
+        </div>
+
+        <div class="nav-links" id="navLinks" role="navigation" aria-label="Main navigation">
+          <button data-target="home" class="active" type="button">Beranda</button>
+          <button data-target="lessons" type="button">Pelajaran</button>
+          <button data-target="quiziz" type="button">Quiziz</button>
+          <button data-target="about" type="button">Tentang</button>
+        </div>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-expanded="false" aria-controls="navLinks" type="button">☰</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="active" tabindex="0">
+      <div class="card hero-wrapper">
+        <div class="hero-text">
+          <div class="hero-title">Selamat datang di STEM Waste Edu</div>
+          <div class="muted" style="margin-bottom:12px;">
+            Website ini membantu presentasi proyek STEM: membangun alat identifikasi & pemilah sampah (Smart Sorter).
+            Pelajari modul teknis, lihat proyek, dan uji pengetahuan lewat kuis.
+          </div>
+
+          <div class="stats" style="margin-bottom:14px;">
+            <div class="stat">
+              <div class="num">6</div>
+              <div class="label">Modul</div>
+            </div>
+            <div class="stat">
+              <div class="num">12</div>
+              <div class="label">Soal Quiz</div>
+            </div>
+            <div class="stat">
+              <div class="num">1</div>
+              <div class="label">Proyek Utama</div>
+            </div>
+          </div>
+
+          <div style="margin-top:6px;">
+            <button class="btn" id="startLessons" type="button">Mulai Belajar</button>
+            <button class="btn ghost" type="button" onclick="navigate('about')">Tentang</button>
+          </div>
+        </div>
+
+        <div class="hero-illustration" aria-hidden="true">
+          <!-- Inline SVG illustration -->
+          <svg viewBox="0 0 600 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ilustrasi pengelolaan sampah">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1">
+                <stop offset="0" stop-color="#DFFCF0"/>
+                <stop offset="1" stop-color="#E9FFF6"/>
+              </linearGradient>
+            </defs>
+            <rect x="0" y="0" width="600" height="420" rx="12" fill="url(#g1)"/>
+            <g transform="translate(60,80)">
+              <rect x="250" y="40" width="120" height="200" rx="8" fill="#34d399" />
+              <rect x="240" y="28" width="140" height="24" rx="6" fill="#10b981" />
+              <circle cx="310" cy="120" r="10" fill="#ffffff" opacity="0.9"/>
+              <text x="275" y="170" fill="#064E3B" font-size="18" font-weight="700">Smart Bin</text>
+            </g>
+            <g transform="translate(40,40)" opacity="0.95">
+              <path d="M120 220c-30 0-44-36-44-36s18-8 44 0c26-8 44 0 44 0s-14 36-44 36z" fill="#34d399"/>
+              <rect x="220" y="150" width="36" height="56" rx="6" fill="#FDE68A" />
+              <rect x="260" y="150" width="36" height="56" rx="6" fill="#BFDBFE" transform="rotate(-14 278 178)"/>
+            </g>
+            <g transform="translate(240,200)">
+              <rect x="0" y="0" width="220" height="110" rx="8" fill="#fff" stroke="#e6f7ef" stroke-width="2"/>
+              <rect x="12" y="12" width="196" height="24" rx="4" fill="#10b981"/>
+              <rect x="12" y="46" width="80" height="14" rx="4" fill="#d1fae5"/>
+              <rect x="100" y="46" width="108" height="14" rx="4" fill="#d1fae5"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div style="margin-top:18px" class="card">
+        <h3 style="color:var(--green-800)">Mengapa edukasi sampah penting?</h3>
+        <ul style="margin-top:10px;color:var(--muted)">
+          <li>Menurunkan volume sampah di lingkungan dan laut.</li>
+          <li>Mendorong solusi teknologi sederhana yang berguna di sekolah.</li>
+          <li>Membekali siswa membuat prototipe berbasis elektronik & coding.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- LESSONS -->
+    <section id="lessons" tabindex="0">
+      <div class="card">
+        <h2>Pelajaran — 6 Modul</h2>
+        <p class="muted-small">Klik modul untuk melihat detail; Modul 6 berisi panduan proyek Smart Sorter lengkap.</p>
+
+        <div class="modules" id="modulesList">
+          <!-- modules (injected by JS) -->
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZIZ -->
+    <section id="quiziz" tabindex="0">
+      <div class="card">
+        <h2>Quiziz — Uji Pengetahuan</h2>
+        <p class="muted-small">Kerjakan kuis singkat ini. Skor dan pembahasan ada di bagian bawah.</p>
+
+        <div class="quiz-area" id="quizArea"></div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about" tabindex="0">
+      <div class="card">
+        <h2>Tentang Aplikasi</h2>
+        <p class="muted-small">Prototype untuk bantu presentasi proyek Smart Sorter (alat identifikasi & pemilah sampah) — cocok untuk tugas/eksperimen STEM sekolah.</p>
+
+        <div class="two-col" style="margin-top:12px">
+          <div class="card">
+            <h4 style="color:var(--green-800)">Tujuan</h4>
+            <ul style="margin-top:8px;color:var(--muted)">
+              <li>Meningkatkan kesadaran pengelolaan sampah dengan praktek langsung.</li>
+              <li>Mengajarkan siswa teknik sederhana sensor & aktuator.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h4 style="color:var(--green-800)">Credits</h4>
+            <p style="color:var(--muted)">Dibuat untuk keperluan proyek STEM. Modul disesuaikan untuk prototipe pemilah otomatis.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;max-width:1100px;margin:22px auto">
+      <div>
+        <strong>STEM Waste Edu</strong>
+        <div style="font-size:13px;opacity:0.95">Mempersiapkan generasi peduli sampah lewat sains & teknologi</div>
+      </div>
+      <div style="font-size:13px;opacity:0.95">© <span id="year"></span> STEM Waste Edu</div>
+    </div>
+  </footer>
+
+  <script>
+    // ========== DATA: Modul (disesuaikan untuk Smart Sorter) ==========
+    const modules = [
+      {
+        id: 'm1',
+        title: 'Modul 1 — Dasar-Dasar Sampah',
+        content: `
+<h4>Ringkasan</h4>
+<p>Pengenalan jenis-jenis sampah (organik, anorganik, B3) dan konsep 3R: Reduce, Reuse, Recycle.</p>
+<h5>Praktikum</h5>
+<ol>
+  <li>Catat sampah di rumah/sekolah selama 3 hari, kelompokkan menjadi organik/anorganik/B3.</li>
+  <li>Buat diagram batang perbandingan volume setiap jenis.</li>
+</ol>`
+      },
+      {
+        id: 'm2',
+        title: 'Modul 2 — Sampah Organik & Komposter',
+        content: `
+<h4>Ringkasan</h4>
+<p>Pengelolaan sampah organik lewat kompos; manfaat dan parameter proses.</p>
+<h5>Proyek kecil</h5>
+<ul>
+  <li>Buat komposter mini menggunakan ember/tong kecil, catat massa tiap minggu.</li>
+</ul>`
+      },
+      {
+        id: 'm3',
+        title: 'Modul 3 — Sampah Anorganik & Daur Ulang',
+        content: `
+<h4>Ringkasan</h4>
+<p>Karakteristik sampah anorganik (plastik/kaca/logam), teknik daur ulang sederhana dan upcycling.</p>
+<h5>Aktivitas</h5>
+<ul>
+  <li>Buat pot tanaman dari botol plastik (upcycling).</li>
+</ul>`
+      },
+      {
+        id: 'm4',
+        title: 'Modul 4 — Sistem Pemilahan Sekolah',
+        content: `
+<h4>Ringkasan</h4>
+<p>Desain alur pemilahan, penempatan stasiun pemilahan, pengukuran, dan indikator keberhasilan.</p>
+<h5>Langkah implementasi</h5>
+<ol>
+  <li>Buat stasiun 3 tempat sampah berlabel (organik, kering/anorganik, metal/B3 terpisah).</li>
+  <li>Tetapkan tim piket dan catat berat tiap minggu.</li>
+</ol>`
+      },
+      {
+        id: 'm5',
+        title: 'Modul 5 — Sensor & Elektronika untuk Pemilah',
+        content: `
+<h4>Ringkasan</h4>
+<p>Pengenalan komponen: microcontroller (Arduino/ESP32), servo, ultrasonic, sensor warna (TCS34725), sensor logam (inductive), buzzer, LED.</p>
+<h5>Wiring & Tes</h5>
+<ol>
+  <li>Uji servo: putar ke posisi 0-90-180.</li>
+  <li>Uji sensor metal: baca HIGH/LOW saat logam dekat sensor.</li>
+  <li>Uji sensor warna: baca RGB dan bandingkan threshold warna.</li>
+</ol>`
+      },
+      {
+        id: 'm6',
+        title: 'Modul 6 — Proyek: Smart Sorter (Identifikasi & Arahkan Sampah)',
+        content: `
+<h4>Tujuan</h4>
+<p>Membangun prototipe pemilah sampah yang bisa mengidentifikasi kategori sederhana (METAL / ORGANIK / KERING) dan mengarahkan item ke wadah yang sesuai.</p>
+
+<h5>Bahan & Komponen</h5>
+<ul>
+  <li>Arduino Uno/Nano atau ESP32</li>
+  <li>Servo motor (1-2 pcs)</li>
+  <li>Inductive proximity sensor (untuk deteksi logam) atau sensor magnet</li>
+  <li>Sensor warna TCS34725 (opsional) untuk bantu deteksi organik</li>
+  <li>HC-SR04 ultrasonic (opsional, untuk mendeteksi posisi item)</li>
+  <li>Buzzer, LED, kabel jumper, breadboard, papan kayu & corong</li>
+</ul>
+
+<h5>Skema Kerja (Algoritme sederhana)</h5>
+<ol>
+  <li>Operator meletakkan satu item di area input.</li>
+  <li>Microcontroller membaca sensor logam → jika terdeteksi, set servo ke posisi METAL.</li>
+  <li>Jika tidak logam → baca sensor warna → jika warna cocok pola 'organik' → set servo ke ORGANIK, jika tidak → KERING.</li>
+  <li>Servo memindahkan chute, item jatuh ke wadah, LED/Buzzer memberi konfirmasi.</li>
+</ol>
+
+<h5>Contoh Kode Arduino (sederhana, tombol simulasi untuk uji)</h5>
+<pre><code>// Contoh sederhana untuk uji mekanik tanpa sensor riil
+#include &lt;Servo.h&gt;
+Servo chute;
+const int btnMetal = 2;    // tombol simulasi metal
+const int btnOrg = 3;      // tombol simulasi organik
+const int ledOK = 13;
+void setup(){
+  chute.attach(9); // pin servo
+  pinMode(btnMetal, INPUT_PULLUP);
+  pinMode(btnOrg, INPUT_PULLUP);
+  pinMode(ledOK, OUTPUT);
+  chute.write(90); // posisi netral
+  Serial.begin(9600);
+}
+void loop(){
+  if (digitalRead(btnMetal)==LOW){
+    Serial.println("Detected METAL");
+    chute.write(40); // arah ke wadah metal (sesuaikan sudut)
+    digitalWrite(ledOK, HIGH);
+    delay(1200); // beri waktu item jatuh
+    chute.write(90);
+    digitalWrite(ledOK, LOW);
+  } else if (digitalRead(btnOrg)==LOW){
+    Serial.println("Detected ORGANIK");
+    chute.write(140); // arah ke wadah organik (sesuaikan sudut)
+    digitalWrite(ledOK, HIGH);
+    delay(1200);
+    chute.write(90);
+    digitalWrite(ledOK, LOW);
+  }
+  delay(50);
+}
+</code></pre>
+
+<h5>Pengujian & Pengukuran</h5>
+<ol>
+  <li>Uji tiap sensor terpisah dan catat hasil (mis. 30 item: 10 logam, 10 organik, 10 kertas).</li>
+  <li>Hitung akurasi: (jumlah benar / total) x 100%.</li>
+  <li>Dokumentasikan kesalahan, analisis penyebab (sensor, pencahayaan, sudut jatuh), dan rencana perbaikan.</li>
+</ol>
+
+<h5>Pengembangan Lanjutan</h5>
+<ul>
+  <li>ESP32-CAM + TensorFlow Lite: klasifikasi gambar untuk banyak kategori.</li>
+  <li>Logging ke Google Sheets / server untuk analitik pemakaian dan level tong.</li>
+  <li>Optimasi mekanik: conveyor kecil atau feeder otomatis.</li>
+</ul>`
+      }
+    ];
+
+    // ========== QUIZ ==========
+    const quiz = [
+      { q: "Sampah organik biasanya berasal dari ...", choices:["Plastik & kaca","Bahan nabati/hewani","Baterai","Elektronik"], a:1, explain:"Organik = bahan nabati/hewani, mudah terurai." },
+      { q: "Sensor inductive cocok untuk mendeteksi ...", choices:["Kertas","Logam","Plastik","Kaca"], a:1, explain:"Sensor inductive mendeteksi benda logam." },
+      { q: "3R singkatan dari?", choices:["Reduce Reuse Recycle","Repair Reuse Recycle","Reduce Reclaim Recycle","Remove Reuse Recycle"], a:0, explain:"Reduce, Reuse, Recycle." },
+      { q: "Fungsi servo pada Smart Sorter adalah ...", choices:["Mendeteksi warna","Memindahkan chute agar item jatuh ke wadah yang benar","Membaca jarak","Merekam data"], a:1, explain:"Servo menggerakkan mekanik untuk mengarahkan item." }
+    ];
+
+    // ========== UI & Wiring ==========
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    const pages = ['home','lessons','quiziz','about'];
+    function navigate(page){
+      if (!pages.includes(page)) page='home';
+      pages.forEach(p => { const el = document.getElementById(p); if (el) el.classList.remove('active'); });
+      const pageEl = document.getElementById(page); if (pageEl) pageEl.classList.add('active');
+      document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+      const btn = document.querySelector('.nav-links button[data-target="'+page+'"]'); if (btn) btn.classList.add('active');
+      if (window.innerWidth <= 860){ const nav = document.getElementById('navLinks'); if (nav) nav.style.display = ''; const mt = document.getElementById('mobileToggle'); if (mt) mt.setAttribute('aria-expanded','false'); }
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    window.navigate = navigate;
+
+    document.querySelectorAll('.nav-links button').forEach(btn => {
+      btn.addEventListener('click', (e) => { const t = e.currentTarget.dataset.target; navigate(t); });
+    });
+    document.getElementById('startLessons').addEventListener('click', ()=> navigate('lessons'));
+
+    // mobile toggle
+    document.getElementById('mobileToggle').addEventListener('click', ()=>{
+      const nav = document.getElementById('navLinks'); const shown = nav.style.display === 'flex';
+      nav.style.display = shown ? '' : 'flex'; document.getElementById('mobileToggle').setAttribute('aria-expanded', (!shown).toString());
+    });
+
+    // outline dropdown
+    const outlineBtn = document.getElementById('outlineBtn');
+    const outlineWrap = document.getElementById('outlineWrap');
+    outlineBtn.addEventListener('click', (ev) => { ev.stopPropagation(); toggleOutline(); });
+    function toggleOutline(){
+      const existing = outlineWrap.querySelector('.outline-menu');
+      if (existing){ existing.remove(); outlineBtn.setAttribute('aria-expanded','false'); return; }
+      const menu = document.createElement('div'); menu.className='outline-menu'; menu.innerHTML = '<div class="title">Outline Halaman</div>';
+      const items = [ {id:'home',label:'Beranda'}, {id:'lessons',label:'Pelajaran'}, {id:'quiziz',label:'Quiziz'}, {id:'about',label:'Tentang'} ];
+      items.forEach(it=>{
+        const b = document.createElement('button'); b.type='button'; b.textContent = it.label;
+        b.addEventListener('click', ()=>{ navigate(it.id); if (menu.parentNode) menu.parentNode.removeChild(menu); outlineBtn.setAttribute('aria-expanded','false'); });
+        menu.appendChild(b);
+      });
+      outlineWrap.appendChild(menu); outlineBtn.setAttribute('aria-expanded','true');
+    }
+    document.addEventListener('click', ()=> { const m = outlineWrap.querySelector('.outline-menu'); if (m) m.remove(); outlineBtn.setAttribute('aria-expanded','false'); });
+
+    // populate modules
+    const modulesList = document.getElementById('modulesList');
+    modules.forEach(m=>{
+      const el = document.createElement('article'); el.className='module';
+      el.innerHTML = `<h3>${m.title}</h3><p style="margin-top:6px;color:var(--muted)">Klik untuk lihat detail.</p>`;
+      const openBtn = document.createElement('div'); openBtn.style.marginTop='10px';
+      openBtn.innerHTML = '<button class="btn" type="button">Lihat Modul</button>';
+      openBtn.querySelector('button').addEventListener('click', ()=> showModuleDetail(m));
+      el.appendChild(openBtn);
+      modulesList.appendChild(el);
+    });
+
+    function showModuleDetail(mod){
+      const backdrop = document.createElement('div'); backdrop.className='modal-backdrop';
+      const card = document.createElement('div'); card.className='modal-card';
+      card.innerHTML = `<h3 style="color:var(--green-800)">${mod.title}</h3><div style="margin-top:10px;color:var(--muted)}">${mod.content}</div><div style="margin-top:12px;text-align:right"><button class="btn" id="closeDetail">Tutup</button></div>`;
+      backdrop.appendChild(card); document.body.appendChild(backdrop);
+      document.getElementById('closeDetail').addEventListener('click', ()=> backdrop.remove());
+      backdrop.addEventListener('click', (e)=> { if (e.target === backdrop) backdrop.remove(); });
+      card.focus();
+    }
+
+    // quiz logic
+    let quizState = { current:0, score:0, finished:false };
+    const quizArea = document.getElementById('quizArea');
+
+    function renderQuiz(){
+      if (!quizArea) return;
+      quizArea.innerHTML = '';
+      if (!quizState.finished){
+        const cur = quiz[quizState.current];
+        const top = document.createElement('div');
+        top.innerHTML = `<div class="muted-small">Soal ${quizState.current+1} / ${quiz.length}</div><h3 style="margin-top:8px;color:var(--green-700)">${cur.q}</h3>`;
+        quizArea.appendChild(top);
+        const choicesWrap = document.createElement('div'); choicesWrap.className='choices';
+        cur.choices.forEach((c,i)=>{
+          const b = document.createElement('button'); b.className='choice'; b.type='button'; b.textContent = c;
+          b.addEventListener('click', ()=> answer(i));
+          choicesWrap.appendChild(b);
+        });
+        quizArea.appendChild(choicesWrap);
+      } else {
+        const res = document.createElement('div'); res.className='center';
+        res.innerHTML = `<div class="score">Skor: ${quizState.score} / ${quiz.length}</div><p style="margin-top:8px;color:var(--muted)">${quizState.score===quiz.length? 'Luar biasa! Semua benar.' : 'Bagus — coba lagi untuk meningkatkan skor.'}</p>`;
+        const actions = document.createElement('div'); actions.style.marginTop='12px';
+        actions.innerHTML = `<button class="btn" id="retry" type="button">Ulangi Kuis</button> <button class="btn ghost" type="button" onclick="navigate('home')">Kembali ke Beranda</button>`;
+        res.appendChild(actions); quizArea.appendChild(res);
+        document.getElementById('retry').addEventListener('click', ()=> { quizState={current:0,score:0,finished:false}; renderQuiz(); });
+      }
+      // explanations
+      const expl = document.createElement('div'); expl.style.marginTop='14px';
+      expl.innerHTML = '<strong>Penjelasan singkat:</strong>';
+      const ul = document.createElement('ul'); ul.style.marginTop='8px';
+      quiz.forEach((q,i)=>{
+        const li = document.createElement('li'); li.style.marginTop='6px';
+        li.innerHTML = `<strong>${i+1}.</strong> ${q.explain}`;
+        ul.appendChild(li);
+      });
+      expl.appendChild(ul); quizArea.appendChild(expl);
+    }
+
+    function answer(idx){
+      if (quizState.finished) return;
+      const correct = quiz[quizState.current].a === idx;
+      if (correct) quizState.score++;
+      quizState.current++;
+      if (quizState.current >= quiz.length) quizState.finished = true;
+      renderQuiz();
+    }
+
+    // init
+    renderQuiz();
+    navigate('home');
+  </script>
+</body>
+</html>
