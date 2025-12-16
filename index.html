@@ -80,6 +80,7 @@
     pre { background:#0f172a; color:#e6ffef; padding:12px; border-radius:8px; overflow:auto; }
     code { font-family:monospace; font-size:13px; color:inherit; }
   </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
@@ -361,11 +362,6 @@ void loop(){
 </code></pre>
 
 <h5>Pengujian & Pengukuran</h5>
-<ol>
-  <li>Uji tiap sensor terpisah dan catat hasil (mis. 30 item: 10 logam, 10 organik, 10 kertas).</li>
-  <li>Hitung akurasi: (jumlah benar / total) x 100%.</li>
-  <li>Dokumentasikan kesalahan, analisis penyebab (sensor, pencahayaan, sudut jatuh), dan rencana perbaikan.</li>
-</ol>
 
 <h5>Pengembangan Lanjutan</h5>
 <ul>
@@ -451,7 +447,7 @@ void loop(){
     }
 
     // quiz logic
-    let quizState = { current:0, score:0, finished:false };
+    let quizState = { current:0, score:0, finished:false, processing:false };
     const quizArea = document.getElementById('quizArea');
 
     function renderQuiz(){
@@ -465,17 +461,23 @@ void loop(){
         const choicesWrap = document.createElement('div'); choicesWrap.className='choices';
         cur.choices.forEach((c,i)=>{
           const b = document.createElement('button'); b.className='choice'; b.type='button'; b.textContent = c;
-          b.addEventListener('click', ()=> answer(i));
+          b.dataset.index = i;
+          b.dataset.correct = (i === cur.a) ? 'true' : 'false';
+          b.addEventListener('click', (e)=> handleChoiceClick(e.currentTarget));
           choicesWrap.appendChild(b);
         });
         quizArea.appendChild(choicesWrap);
+        const controls = document.createElement('div'); controls.style.marginTop='12px';
+        const nextBtn = document.createElement('button'); nextBtn.className='btn'; nextBtn.type='button'; nextBtn.id='nextBtn'; nextBtn.textContent = 'Selanjutnya'; nextBtn.style.display = 'none';
+        controls.appendChild(nextBtn);
+        quizArea.appendChild(controls);
       } else {
         const res = document.createElement('div'); res.className='center';
         res.innerHTML = `<div class="score">Skor: ${quizState.score} / ${quiz.length}</div><p style="margin-top:8px;color:var(--muted)">${quizState.score===quiz.length? 'Luar biasa! Semua benar.' : 'Bagus — coba lagi untuk meningkatkan skor.'}</p>`;
         const actions = document.createElement('div'); actions.style.marginTop='12px';
         actions.innerHTML = `<button class="btn" id="retry" type="button">Ulangi Kuis</button> <button class="btn ghost" type="button" onclick="navigate('home')">Kembali ke Beranda</button>`;
         res.appendChild(actions); quizArea.appendChild(res);
-        document.getElementById('retry').addEventListener('click', ()=> { quizState={current:0,score:0,finished:false}; renderQuiz(); });
+        document.getElementById('retry').addEventListener('click', ()=> { quizState={current:0,score:0,finished:false,processing:false}; renderQuiz(); });
       }
       // explanations
       const expl = document.createElement('div'); expl.style.marginTop='14px';
@@ -489,13 +491,43 @@ void loop(){
       expl.appendChild(ul); quizArea.appendChild(expl);
     }
 
-    function answer(idx){
-      if (quizState.finished) return;
-      const correct = quiz[quizState.current].a === idx;
-      if (correct) quizState.score++;
-      quizState.current++;
-      if (quizState.current >= quiz.length) quizState.finished = true;
-      renderQuiz();
+    function handleChoiceClick(btn){
+      if (quizState.processing || quizState.finished) return;
+      quizState.processing = true;
+      const wrapper = btn.parentElement;
+      const buttons = Array.from(wrapper.querySelectorAll('.choice'));
+      buttons.forEach(b => b.classList.add('disabled'));
+
+      const isCorrect = btn.dataset.correct === 'true';
+      if (isCorrect){
+        btn.classList.add('correct');
+      } else {
+        btn.classList.add('wrong');
+        const correctBtn = buttons.find(b=>b.dataset.correct === 'true');
+        if (correctBtn) correctBtn.classList.add('correct');
+      }
+
+      // show Next button instead of auto-advance
+      const nextBtn = quizArea.querySelector('#nextBtn');
+      if (nextBtn){
+        nextBtn.style.display = 'inline-block';
+        nextBtn.focus();
+        const advance = () => {
+          if (isCorrect) quizState.score++;
+          quizState.current++;
+          if (quizState.current >= quiz.length) quizState.finished = true;
+          quizState.processing = false;
+          renderQuiz();
+        };
+        nextBtn.addEventListener('click', function handler(){ advance(); nextBtn.removeEventListener('click', handler); });
+      } else {
+        // fallback to advance if nextBtn not found
+        if (isCorrect) quizState.score++;
+        quizState.current++;
+        if (quizState.current >= quiz.length) quizState.finished = true;
+        quizState.processing = false;
+        renderQuiz();
+      }
     }
 
     // init

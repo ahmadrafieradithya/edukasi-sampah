@@ -1,0 +1,11 @@
+/* Styles for quiz answer feedback */
+.choice.correct{ background: #dcfce7; border-color: #10b981; color: #064e3b; box-shadow: 0 2px 8px rgba(16,185,129,0.08); }
+.choice.wrong{ background: #fee2e2; border-color: #ef4444; color: #7f1d1d; box-shadow: 0 2px 8px rgba(239,68,68,0.06); }
+.choice.disabled{ opacity: 0.85; pointer-events: none; }
+.choices .choice{ transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, transform 120ms ease; }
+.choice.correct::after{ content: '\2713'; float:right; font-weight:800; }
+.choice.wrong::after{ content: '\2715'; float:right; font-weight:800; }
+
+/* Improve focus/hover visibility */
+.choice:focus{ outline:2px solid rgba(6,95,70,0.12); outline-offset:2px; }
+
